@@ -7,10 +7,10 @@ if (!require("rpart")) install.packages("rpart")
 propensity_score_ld <- function(data) {
   # fine-tuned model
   optimal_tree <- rpart(
-    formula = Y ~ .,
+    formula = A ~ .,
     data    = data,
     method  = "anova",
-    control = list(minsplit = 10, maxdepth = 10, cp = 0.01)
+    control = list(minsplit = 16, maxdepth = 13, cp = 0.02253)
   )
   
   # predictions
@@ -22,10 +22,10 @@ propensity_score_ld <- function(data) {
 propensity_score_hd <- function(data) {
   # fine-tuned model
   optimal_tree <- rpart(
-    formula = Y ~ .,
+    formula = A ~ .,
     data    = data,
     method  = "anova",
-    control = list(minsplit = 14, maxdepth = 22, cp = 0.01)
+    control = list(minsplit = 13, maxdepth = 23, cp = 0.01)
   )
   
   # predictions

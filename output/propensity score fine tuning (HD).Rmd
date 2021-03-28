@@ -33,7 +33,7 @@ test  <- testing(data_split)
 ### Build first model
 ```{r}
 m1 <- rpart(
-  formula = Y ~ .,
+  formula = A ~ .,
   data    = train,
   method  = "anova"
 )
@@ -56,7 +56,7 @@ plotcp(m1)
 ### Force rpart to generate a full tree by using
 ```{r}
 m2 <- rpart(
-  formula = Y ~ .,
+  formula = A ~ .,
   data    = train,
   method  = "anova",
   control = list(cp = 0, xval = 10)
@@ -71,7 +71,7 @@ rpart.plot(m2)
 ### Plot cross validated error summary
 ```{r}
 plotcp(m2)
-abline(v = 7, lty = "dashed")
+abline(v = 6, lty = "dashed")
 ```
 
 We can see that after 7 terminal nodes, we see diminishing returns in error reduction as the tree grows deeper. Thus, we can significantly prune our tree and still achieve minimal expected error.
@@ -81,7 +81,7 @@ We can see that after 7 terminal nodes, we see diminishing returns in error redu
 ```{r}
 hyper_grid <- expand.grid(
   minsplit = seq(5, 20, 1),
-  maxdepth = seq(8, 40, 1)
+  maxdepth = seq(8, 30, 1)
 )
 ```
 
@@ -96,7 +96,7 @@ for (i in 1:nrow(hyper_grid)) {
   
   # train a model and store in the list
   models[[i]] <- rpart(
-    formula = Y ~ .,
+    formula = A ~ .,
     data    = train,
     method  = "anova",
     control = list(minsplit = minsplit, maxdepth = maxdepth)
@@ -134,12 +134,15 @@ hyper_grid %>%
 ### Optimal Tree and its RMSE
 ```{r}
 optimal_tree <- rpart(
-  formula = Y ~ .,
+  formula = A ~ .,
   data    = train,
   method  = "anova",
-  control = list(minsplit = 14, maxdepth = 22, cp = 0.01)
+  control = list(minsplit = 13, maxdepth = 23, cp = 0.01)
 )
 
 pred <- predict(optimal_tree, newdata = test)
-RMSE(pred = pred, obs = test$Y)
+RMSE(pred = pred, obs = test$A)
+```
+```{r}
+pred
 ```

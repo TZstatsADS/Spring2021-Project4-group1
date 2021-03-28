@@ -6,10 +6,6 @@ output: html_document
 Source: https://uc-r.github.io/regression_trees
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 ## R Markdown
 ```{r}
 setwd("/Users/my_love/Desktop/Applied Data Science/Project 4/Spring2021-Project4-project4group1/")
@@ -22,8 +18,6 @@ library(rsample)     # data splitting
 library(dplyr)       # data wrangling
 library(rpart)       # performing regression trees
 library(rpart.plot)  # plotting regression trees
-library(ipred)       # bagging
-library(caret)       # bagging
 ```
 
 ### Train test split
@@ -37,7 +31,7 @@ test  <- testing(data_split)
 ### Build first model
 ```{r}
 m1 <- rpart(
-  formula = Y ~ .,
+  formula = A ~ .,
   data    = train,
   method  = "anova"
 )
@@ -56,7 +50,7 @@ plotcp(m1)
 ### Force rpart to generate a full tree by using
 ```{r}
 m2 <- rpart(
-  formula = Y ~ .,
+  formula = A ~ .,
   data    = train,
   method  = "anova",
   control = list(cp = 0, xval = 10)
@@ -71,7 +65,7 @@ rpart.plot(m2)
 ### Plot cross validated error summary
 ```{r}
 plotcp(m2)
-abline(v = 13, lty = "dashed")
+abline(v = 16, lty = "dashed")
 ```
 
 We can see that after 13 terminal nodes, we see diminishing returns in error reduction as the tree grows deeper. Thus, we can significantly prune our tree and still achieve minimal expected error.
@@ -81,7 +75,7 @@ We can see that after 13 terminal nodes, we see diminishing returns in error red
 ```{r}
 hyper_grid <- expand.grid(
   minsplit = seq(5, 20, 1),
-  maxdepth = seq(8, 15, 1)
+  maxdepth = seq(8, 20, 1)
 )
 ```
 
@@ -97,7 +91,7 @@ for (i in 1:nrow(hyper_grid)) {
   
   # train a model and store in the list
   models[[i]] <- rpart(
-    formula = Y ~ .,
+    formula = A ~ .,
     data    = train,
     method  = "anova",
     control = list(minsplit = minsplit, maxdepth = maxdepth)
@@ -135,12 +129,13 @@ hyper_grid %>%
 ### Optimal Tree and its RMSE
 ```{r}
 optimal_tree <- rpart(
-  formula = Y ~ .,
+  formula = A ~ .,
   data    = train,
   method  = "anova",
-  control = list(minsplit = 10, maxdepth = 10, cp = 0.01)
+  control = list(minsplit = 16, maxdepth = 13, cp = 0.02253)
 )
 
 pred <- predict(optimal_tree, newdata = test)
-RMSE(pred = pred, obs = test$Y)
+RMSE(pred = pred, obs = test$A)
 ```
+
