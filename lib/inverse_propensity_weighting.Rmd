@@ -1,0 +1,74 @@
+---
+title: "Inverse Propensity Weighting"
+author: "Changhao He"
+date: "2021/3/30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+data_ld <- read.csv(file = "../data/lowDim_dataset.csv")
+data_hd <- read.csv(file = "../data/highDim_dataset.csv")
+```
+
+
+```{r}
+source("../lib/propensity_score.R")
+```
+
+## ATE of lower dimension data using inverse propensity weighting
+
+```{r}
+ps_ld <- propensity_score_ld(data_ld)
+```
+
+```{r}
+ipwdf_ld <- data_ld
+for (i in 1:nrow(ipwdf_ld)){
+  if (ipwdf_ld$A[i] == 1){
+    ipwdf_ld$ipw[i] <- 1/ps_ld[i]
+  }
+  else{
+    ipwdf_ld$ipw[i] <- 1/(1-ps_ld[i])
+  }
+}
+```
+
+```{r}
+treated_ld <- ipwdf_ld%>%
+  filter(A == 1)
+controlled_ld <- ipwdf_ld%>%
+  filter(A == 0)
+
+treatsum_ld <- sum(treated_ld$Y * treated_ld$ipw)
+controlsum_ld <- sum(controlled_ld$Y * controlled_ld$ipw)
+ATE_ipw_ld <- (treatsum_ld - controlsum_ld)/nrow(data_ld)
+cat("ATE of lower dimension data using inverse propensity weighting is",ATE_ipw_ld)
+```
+
+## ATE of higher dimension data using inverse propensity weighting
+
+```{r}
+ipwdf_hd <- data_hd
+for (i in 1:nrow(ipwdf_hd)){
+  if (ipwdf_hd$A[i] == 1){
+    ipwdf_hd$ipw[i] <- 1/ps_hd[i]
+  }
+  else{
+    ipwdf_hd$ipw[i] <- 1/(1-ps_hd[i])
+  }
+}
+```
+
+```{r}
+treated_hd <- ipwdf_hd%>%
+  filter(A == 1)
+
+controlled_hd <- ipwdf_hd%>%
+  filter(A == 0)
+
+treatsum_hd <- sum(treated_hd$Y * treated_hd$ipw)
+controlsum_hd <- sum(controlled_hd$Y * controlled_hd$ipw)
+ATE_ipw_hd <- (treatsum_hd - controlsum_hd)/nrow(data_hd)
+cat("ATE of higher dimension data using inverse propensity weighting is",ATE_ipw_hd)
+```
+
