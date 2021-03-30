@@ -6,30 +6,32 @@ if (!require("rpart")) install.packages("rpart")
 
 propensity_score_ld <- function(data) {
   # fine-tuned model
+  data_clean <- subset(data, select = -Y)
   optimal_tree <- rpart(
     formula = A ~ .,
-    data    = data,
+    data    = data_clean,
     method  = "anova",
-    control = list(minsplit = 16, maxdepth = 13, cp = 0.02253)
+    control = list(minsplit = 5, maxdepth = 16, cp = 0.0258)
   )
   
   # predictions
-  pred <- predict(optimal_tree, newdata = data)
+  pred <- predict(optimal_tree, newdata = data_clean)
   
   return(pred)
 }
 
 propensity_score_hd <- function(data) {
   # fine-tuned model
+  data_clean <- subset(data, select = -Y)
   optimal_tree <- rpart(
     formula = A ~ .,
-    data    = data,
+    data    = data_clean,
     method  = "anova",
-    control = list(minsplit = 13, maxdepth = 23, cp = 0.01)
+    control = list(minsplit = 11, maxdepth = 16, cp = 0.01)
   )
   
   # predictions
-  pred <- predict(optimal_tree, newdata = data)
+  pred <- predict(optimal_tree, newdata = data_clean)
   
   return(pred)
 }
