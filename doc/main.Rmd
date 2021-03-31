@@ -70,18 +70,34 @@ $$
 $$
 
 [TODO: Add implementation details]
+[TODO: Add a visualization for ATE]
 
 Source: https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/36552.pdf
 
 ## Doubly Robust Estimation
+Doubly robust model uses estimated propensity scores $\hat{e_i}$ for reweighting observations to eliminate confounding and selection bias in observational settings. It has the following formula for computing the ATE: 
+
+$$
+\hat{\Delta}_{DR} = \frac{1}{N}\sum^N_{i=1}\frac{T_iY_i - (T_i - \hat{e_i})\hat{m_1}(X_i)}{\hat{e_i}} - \frac{1}{N}\sum^N_{i=1}\frac{(1 - T_i)Y_i + (T_i - \hat{e_i})\hat{m_0}(X_i)}{1 - \hat{e_i}}
+$$
+
+where $\hat{m_t}(X)$ is a consistentt estimate for $E(Y|T=t, X)$ and is obtained by regressing the observed response $Y$ on $X$ in group t (where $t = 0, 1$). It is "doubly robust" in a way that it requires only one model to be consistent - either propensity score model or the regression model. Computation of both models makes the Doubly Robust Estimator less efficient however, it produces the smallest asymptotic variance. 
 
 [TODO: Add implementation details]
+[TODO: Add a visualization for ATE]
 
 ## Regression Estimate
-[TODO: Description]
+Regression Estimate is a simple regression algorithm that doesn’t make use of the propensity score. The model makes predictions for the control and treatment groups, and calculates the ATE using these predictions. The formula is below: 
+
+$$
+\hat{\Delta}_{reg} = \frac{1}{N}\sum^N_{i=1}(\hat{m_1}X_i - \hat{m_0}X_i)
+$$
+
 [TODO: Add implementation details]
+[TODO: Add a visualization for ATE]
 
 # Step 3: Comparison of Algorithms for High Dimensional Data
+Note: $performance = (true\_ate - est\_ate)^2$
 ```{r echo=FALSE}
 comparison_table_hd <- data.frame(
    "Algorithm" = c(
@@ -92,7 +108,7 @@ comparison_table_hd <- data.frame(
    "True_ATE" = c(0, 0, 0),
    "Computed_ATE" = c(0, 0, 0),
    "Run_Time" = c("sec", "sec", "sec"),
-   "Error" = c(0, 0, 0)
+   "Performance" = c(0, 0, 0)
 )
 
 comparison_table_hd %>%
@@ -100,6 +116,7 @@ comparison_table_hd %>%
   kable_styling(latex_options = "hold_position")
 ```
 # Step 4: Comparison of Algorithms for Low Dimensional Data
+Note: $performance = (true\_ate - est\_ate)^2$
 ```{r echo=FALSE}
 comparison_table_ld <- data.frame(
    "Algorithm" = c(
@@ -110,7 +127,7 @@ comparison_table_ld <- data.frame(
    "True_ATE" = c(0, 0, 0),
    "Computed_ATE" = c(0, 0, 0),
    "Run_Time" = c("sec", "sec", "sec"),
-   "Error" = c(0, 0, 0)
+   "Performance" = c(0, 0, 0)
 )
 
 comparison_table_ld %>%
@@ -118,8 +135,5 @@ comparison_table_ld %>%
   kable_styling(latex_options = "hold_position")
 ```
  
-# Step 5: Analysis
-
-
-# Step 6: Conclusion
-
+# Step 5: Analysis and Conclusion
+As we can see from the table above ...
