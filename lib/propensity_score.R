@@ -1,7 +1,6 @@
 # Source: https://uc-r.github.io/regression_trees
 # for hyper-parameters tuning see propensity score fine tuning files in output directory
 
-setwd("/Users/my_love/Desktop/Applied Data Science/Project 4/Spring2021-Project4-project4group1/")
 if (!require("rpart")) install.packages("rpart")
 
 propensity_score_ld <- function(data) {
@@ -17,7 +16,7 @@ propensity_score_ld <- function(data) {
   # predictions
   pred <- predict(optimal_tree, newdata = data_clean)
   
-  return(pred)
+  return(pred[, 2])
 }
 
 propensity_score_hd <- function(data) {
@@ -33,5 +32,5 @@ propensity_score_hd <- function(data) {
   # predictions
   pred <- predict(optimal_tree, newdata = data_clean)
   
-  return(pred)
+  return(pred[, 2])
 }
