@@ -8,18 +8,26 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+if (!require("kableExtra")) install.packages("kableExtra")
+library(kableExtra)
 ```
 
 # Introduction
-This project aims to explore different algorithms for causal inference. Causal inference refers to the process of drawing a conclusion about a causal connection based on the conditions of the occurrence of an effect. The goal is to estimate the average treatment effect (ATE) in detail through implementation (using R), evaluation, and comparison. The algorithms include Inverse Propensity Weighting, Doubly Robust Estimation, and Regression Estimate. For the first two algorithms, we also had to compute propensity score using classification and regression trees (CART). To evaluate our algorithms, we were given two datasets (low-dimensional and high-dimensional) as well as correct ATE.
+This project aims to explore different algorithms for causal inference. Causal inference refers to the process of drawing a conclusion about a causal connection based on the conditions of the occurrence of an effect. The goal is to estimate the average treatment effect (ATE) in detail through implementation (using R), evaluation, and comparison. The algorithms include Inverse Propensity Weighting, Doubly Robust Estimation, and Regression Estimate. For the first two algorithms, we also had to compute propensity score using classification and regression trees (CART). To evaluate our algorithms, we were given two data sets (low-dimensional and high-dimensional) as well as correct ATE.
 
 # Step 1: Computing Propensity Scores
+We define propensity score as 
+
+$$
+e(x) = Pr(T=1|X=x)
+$$
+assuming that for all x
+
+$$
+0<e(x)<1
+$$
 ### Classification and Regression Trees (CART)
-CART is a classification and regression algorithm, which specify a ‘tree’ of cut points that minimize some measures of diversity in the final nodes once the the tree is complete. On the image below, you can see an example of a decision tree for a low-dimensional data set. 
-
-![Decision tree for a low dimensional data](../figs/decision_tree_ld.png){width=70%}
-
-One of the CART's benefits is that it can  provide a probability of class membership, which we will use as our propensity score.
+In this project we will be using CART to estimate the propensity scores. In brief, CART is a classification and regression algorithm, which specify a ‘tree’ of cut points that minimize some measures of diversity in the final nodes once the the tree is complete. CART provides a probability of class membership, which we will use as our propensity score.
 
 For CART method, we first split the space into two regions, and model the response by the mean of Y in each region. We choose the variable and split-point to achieve the best fit. Then one or both of these regions are split into two more regions, and this process is continued, until some stopping rule is applied. The corresponding regression model predicts Y with a constant $c_m$ in region $R_m$, that is,
 
@@ -28,6 +36,9 @@ $$
 $$
 
 where M is the total number of regions.
+
+On the image below, you can see an example of a decision tree for a low-dimensional data set. 
+![Decision tree for a low dimensional data](../figs/decision_tree_ld.png){width=70%}
 
 ###  Computing Propensity Scores
 To compute propensity scores, we used CART. We built two separate fine-tuned models for high-dimensional and low-dimensional data, respectively. Each model returns a set of probabilities that a given data point belongs to class 1.
@@ -57,20 +68,52 @@ $$
 Source: https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/36552.pdf
 
 ## Doubly Robust Estimation
-[TODO: Description]
+
 [TODO: Add implementation details]
 
 ## Regression Estimate
 [TODO: Description]
 [TODO: Add implementation details]
 
-# Step 3: Comparison
- - Complexity (space/memory)
- - Execution Time
- - ATE Standard error
+# Step 3: Comparison of Algorithms for High Dimensional Data
+```{r echo=FALSE}
+comparison_table_hd <- data.frame(
+   "Algorithm" = c(
+     "Inverse Propensity Weighting",
+     "Doubly Robust Estimation",
+     "Regression Estimate"),
+   "Complexity" = c("O()", "O()", "O()"),
+   "True_ATE" = c(0, 0, 0),
+   "Computed_ATE" = c(0, 0, 0),
+   "Run_Time" = c("sec", "sec", "sec"),
+   "Error" = c(0, 0, 0)
+)
+
+comparison_table_hd %>%
+  kbl() %>%
+  kable_styling(latex_options = "hold_position")
+```
+# Step 4: Comparison of Algorithms for Low Dimensional Data
+```{r echo=FALSE}
+comparison_table_ld <- data.frame(
+   "Algorithm" = c(
+     "Inverse Propensity Weighting",
+     "Doubly Robust Estimation",
+     "Regression Estimate"),
+   "Complexity" = c("O()", "O()", "O()"),
+   "True_ATE" = c(0, 0, 0),
+   "Computed_ATE" = c(0, 0, 0),
+   "Run_Time" = c("sec", "sec", "sec"),
+   "Error" = c(0, 0, 0)
+)
+
+comparison_table_ld %>%
+  kbl() %>%
+  kable_styling(latex_options = "hold_position")
+```
  
-# Analysis
+# Step 5: Analysis
 
 
-# Conclusion
+# Step 6: Conclusion
 
