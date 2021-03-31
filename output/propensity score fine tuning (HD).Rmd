@@ -35,7 +35,6 @@ test  <- testing(data_split)
 m1 <- rpart(
   formula = A ~ .,
   data    = train,
-  method  = "anova"
 )
 ```
 
@@ -58,7 +57,7 @@ plotcp(m1)
 m2 <- rpart(
   formula = A ~ .,
   data    = train,
-  method  = "anova",
+  method  = "class",
   control = list(cp = 0, xval = 10)
 )
 ```
@@ -67,15 +66,6 @@ m2 <- rpart(
 ```{r}
 rpart.plot(m2)
 ```
-
-### Plot cross validated error summary
-```{r}
-plotcp(m2)
-abline(v = 6, lty = "dashed")
-```
-
-We can see that after 7 terminal nodes, we see diminishing returns in error reduction as the tree grows deeper. Thus, we can significantly prune our tree and still achieve minimal expected error.
-
 ## Tuning
 ### Create a grid search
 ```{r}
@@ -98,7 +88,7 @@ for (i in 1:nrow(hyper_grid)) {
   models[[i]] <- rpart(
     formula = A ~ .,
     data    = train,
-    method  = "anova",
+    method  = "class",
     control = list(minsplit = minsplit, maxdepth = maxdepth)
   )
 }
@@ -133,13 +123,24 @@ hyper_grid %>%
 
 ### Optimal Tree and its RMSE
 ```{r}
-optimal_tree <- rpart(
+optimal_tree_hd <- rpart(
   formula = A ~ .,
-  data    = train,
-  method  = "anova",
-    control = list(minsplit = 11, maxdepth = 16, cp = 0.01)
+  data    = data,
+  method  = "class",
+    control = list(minsplit = 11, maxdepth = 20, cp = 0.0126)
 )
 
-pred <- predict(optimal_tree, newdata = test)
-RMSE(pred = pred, obs = test$A)
+pred <- predict(optimal_tree_hd, newdata = data)
+```
+
+```{r}
+rpart.plot(optimal_tree_hd)
+```
+
+```{r}
+hist(pred[, 2], main='Histogram of probabilities that individual belongs to class 1', xlab = 'Probability')
+```
+
+```{r}
+hist(data$A)
 ```

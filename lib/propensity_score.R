@@ -10,8 +10,8 @@ propensity_score_ld <- function(data) {
   optimal_tree <- rpart(
     formula = A ~ .,
     data    = data_clean,
-    method  = "anova",
-    control = list(minsplit = 5, maxdepth = 16, cp = 0.0258)
+    method  = "class",
+    control = list(minsplit = 20, maxdepth = 15, cp = 0.0126)
   )
   
   # predictions
@@ -26,8 +26,8 @@ propensity_score_hd <- function(data) {
   optimal_tree <- rpart(
     formula = A ~ .,
     data    = data_clean,
-    method  = "anova",
-    control = list(minsplit = 11, maxdepth = 16, cp = 0.01)
+    method  = "class",
+    control = list(minsplit = 11, maxdepth = 20, cp = 0.0126)
   )
   
   # predictions
