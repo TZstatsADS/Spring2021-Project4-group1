@@ -105,8 +105,8 @@ comparison_table_hd <- data.frame(
      "Doubly Robust Estimation",
      "Regression Estimate"),
    "Complexity" = c("O()", "O()", "O(N*P^2 + P^3)"),
-   "True_ATE" = c(0, 0, 0),
-   "Computed_ATE" = c(0, 0, 0),
+   "True_ATE" = c(-54.8558, -54.8558, -54.8558),
+   "Computed_ATE" = c(-61.89046, 0, 0),
    "Run_Time" = c("sec", "sec", "31 sec"),
    "Performance" = c(0, 0, 0)
 )
@@ -124,8 +124,8 @@ comparison_table_ld <- data.frame(
      "Doubly Robust Estimation",
      "Regression Estimate"),
    "Complexity" = c("O()", "O()", "O()"),
-   "True_ATE" = c(0, 0, 0),
-   "Computed_ATE" = c(0, 0, 0),
+   "True_ATE" = c(2.0901, 2.0901, 2.0901),
+   "Computed_ATE" = c(4.35356, 0, 0),
    "Run_Time" = c("sec", "sec", "sec"),
    "Performance" = c(0, 0, 0)
 )
