@@ -93,7 +93,7 @@ $$
 \hat{\Delta}_{reg} = \frac{1}{N}\sum^N_{i=1}(\hat{m_1}X_i - \hat{m_0}X_i)
 $$
 
-[TODO: Add implementation details]
+The regression estimate was computed by first deriving consistent estimators for $E(Y|T =1, X)$ and $E(Y|T =1, X)$, respectively. These estimators were derived by computing two regression estimates on Y (corresponding to the subsets of the data where $T = 1$ and $T = 0$) using all the features as predictors. Then, using a simple for loop, we could easily compute the regression estimate for the dataset by looking at the linear model predictions on each row of data (observation). We took the difference of the predictions for the treated and untreated estimators and then summed all the differences, then divided by N (the number of observations) to get our average treatment effect. The approach was identical for both low-dimensional and high dimensional data. The expression for the time complexity was determined by that of linear regression, since this part of the algorithm dominated the rest.
 [TODO: Add a visualization for ATE]
 
 # Step 3: Comparison of Algorithms for High Dimensional Data
@@ -104,10 +104,10 @@ comparison_table_hd <- data.frame(
      "Inverse Propensity Weighting",
      "Doubly Robust Estimation",
      "Regression Estimate"),
-   "Complexity" = c("O()", "O()", "O()"),
+   "Complexity" = c("O()", "O()", "O(N*P^2 + P^3)"),
    "True_ATE" = c(0, 0, 0),
    "Computed_ATE" = c(0, 0, 0),
-   "Run_Time" = c("sec", "sec", "sec"),
+   "Run_Time" = c("sec", "sec", "31 sec"),
    "Performance" = c(0, 0, 0)
 )
 
