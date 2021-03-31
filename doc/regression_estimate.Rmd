@@ -1,0 +1,102 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(dplyr)
+library(dbplyr)
+library(dbplot)
+library(DBI)
+ 
+
+start = Sys.time()
+
+dfh = read.csv('C:\\Users\\morrismr\\Downloads\\data\\highDim_dataset.csv')
+dfl = read.csv('C:\\Users\\morrismr\\Downloads\\data\\lowDim_dataset.csv')
+
+# dfh['my_extra_column'] = dfh['A'] + 1
+  
+
+
+dfh_treated = dfh[dfh$A == 1, ]#expr[expr$cell_type %in% c("hesc", "bj fibroblast"), ]
+dfh_control = dfh[dfh$A == 0, ]
+dfl_treated = dfl[dfl$A == 1, ]
+dfl_control = dfl[dfl$A == 0, ]
+
+mhat_highdim_1 = lm(Y~., data=dfh_treated)
+mhat_highdim_0 = lm(Y~., data=dfh_control)
+# summary(mhat_highdim_1)
+# summary(mhat_highdim_0)
+
+# mt(X) is a consistent estimate for E(Y given T = t and X)
+# regress Y on X (two cases, one for group where t = 1 and one where t = 0)
+
+hist(dfh$A)
+# str(dfh)
+N = nrow(dfh)
+sum = 0
+m1_total = 0
+m0_total = 0
+for(i in 1:N) #run through each row in original dataset
+{
+  # print(i)
+  m1 <- suppressWarnings(predict(mhat_highdim_1, newdata=dfh[i,]))
+  m0 <- suppressWarnings(predict(mhat_highdim_0, newdata=dfh[i,]))
+  m1_total = m1_total + m1
+  m0_total = m0_total + m0
+  sum = sum +  m1 - m0
+}
+output_high = sum/N
+sprintf("High-dimensional estiamte of ATE: %f", output_high)
+
+dfh_treated[1,"Y"]
+
+
+
+mhat_lowdim_1 = lm(Y~., data=dfl_treated)
+mhat_lowdim_0 = lm(Y~., data=dfl_control)
+# summary(mhat_lowdim_1)
+# summary(mhat_lowdim_0)
+
+# mt(X) is a consistent estimate for E(Y given T = t and X)
+# regress Y on X (two cases, one for group where t = 1 and one where t = 0)
+
+# hist(dfl$A)
+
+# str(dfl)
+N = nrow(dfl)
+sum = 0
+m1_total = 0
+m0_total = 0
+for(i in 1:N) #run through each row in original dataset
+{
+  # print(i)
+  m1 <- suppressWarnings(predict(mhat_lowdim_1, newdata=dfl[i,]))
+  m0 <- suppressWarnings(predict(mhat_lowdim_0, newdata=dfl[i,]))
+  m1_total = m1_total + m1
+  m0_total = m0_total + m0
+  sum = sum +  m1 - m0
+}
+output_low = sum/N
+
+sprintf("Low dimensional estiamte of ATE: %f", output_low)
+
+end = Sys.time()
+print(as.numeric(end - start, units = "secs"))
+
+
+
+
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
