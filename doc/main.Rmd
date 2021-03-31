@@ -37,11 +37,17 @@ $$
 
 where M is the total number of regions.
 
-On the image below, you can see an example of a decision tree for a low-dimensional data set. 
-![Decision tree for a low dimensional data](../figs/decision_tree_ld.png){width=70%}
 
 ###  Computing Propensity Scores
 To compute propensity scores, we used CART. We built two separate fine-tuned models for high-dimensional and low-dimensional data, respectively. Each model returns a set of probabilities that a given data point belongs to class 1.
+
+![Decision tree for low dimensional data](../figs/tree ld.png){width=60%}
+
+![Histogram of probabilities that an individual belongs to class 1 for low dimenssional data](../figs/hist ld prob.png){width=60%}
+
+![Decision tree for high dimenssional data](../figs/tree hd.png){width=60%}
+
+![Histogram of probabilities that an individual belongs to class 1 for high dimenssional data.](../figs/hist hd prob.png){width=60%}
 
 # Step 2: Algorithms
 
