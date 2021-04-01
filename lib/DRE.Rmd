@@ -1,0 +1,111 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+Setup
+```{r}
+library(glmnet)
+library(rsample)
+library(ggplot2)
+```
+
+load data
+```{r}
+ldim <- read.csv("../data/lowDim_dataset.csv")
+hdim <- read.csv("../data/highDim_dataset.csv")
+
+# Low Dimension
+lA <- ldim$A
+lY <- ldim$Y
+lData <- ldim[,-c(1,2)]
+
+# High Dimension
+hA <- hdim$A
+hY <- hdim$Y
+hData <- hdim[, -c(1,2)]
+```
+
+PS
+```{r}
+if (!require("rpart")) install.packages("rpart")
+
+propensity_score_ld <- function(data) {
+  # fine-tuned model
+  data_clean <- subset(data, select = -Y)
+  
+  # Train test split
+  set.seed(123)
+  data_split <- initial_split(data_clean, prop = .7)
+  train <- training(data_split)
+  test  <- testing(data_split)
+  
+  # build a model
+  optimal_tree <- rpart(
+    formula = A ~ .,
+    data    = train,
+    method  = "class",
+    control = list(minsplit = 20, maxdepth = 15, cp = 0.0126)
+  )
+  
+  # predictions
+  pred <- predict(optimal_tree, newdata = data_clean)
+  
+  return(pred[, 2])
+}
+
+propensity_score_hd <- function(data) {
+  # fine-tuned model
+  data_clean <- subset(data, select = -Y)
+  
+  # Train test split
+  set.seed(123)
+  data_split <- initial_split(data_clean, prop = .7)
+  train <- training(data_split)
+  test  <- testing(data_split)
+  
+  # build a model
+  optimal_tree <- rpart(
+    formula = A ~ .,
+    data    = train,
+    method  = "class",
+    control = list(minsplit = 11, maxdepth = 20, cp = 0.0126)
+  )
+  
+  # predictions
+  pred <- predict(optimal_tree, newdata = data_clean)
+  
+  return(pred[, 2])
+}
+```
+
+Prop_score
+```{r}
+ps_low <- propensity_score_ld(ldim)
+ps_high <- propensity_score_hd(hdim)
+```
+
+Linear regression
+```{r}
+lr_low1 <- glm(formula=Y~ .,data = ldim[which(ldim$A=='1'),])
+lr_low0 <- glm(formula=Y~ .,data = ldim[which(ldim$A=='0'),])
+lm1 <- predict(lr_low1,ldim[,-c(1)])
+lm0 <- predict(lr_low0,ldim[,-c(1)])
+
+lr_high1 <- glm(formula=Y~ .,data = hdim[which(hdim$A=='1'),])
+lr_high0 <- glm(formula=Y~ .,data = hdim[which(hdim$A=='0'),])
+hm1 <- predict(lr_high1,hdim[,-c(1)])
+hm0 <- predict(lr_high0,hdim[,-c(1)])
+```
+
+DRE
+```{r}
+ATE_low <- sum((lA*lY-(lA-ps_low)*lm1)/ps_low)/dim(ldim)[1] -sum(((1-lA)*lY+(lA-ps_low)*lm0)/(1-ps_low))/dim(ldim)[1]
+ATE_high <- sum((hA*hY-(hA-ps_high)*hm1)/ps_high)/dim(hdim)[1] -sum(((1-hA)*hY+(hA-ps_high)*hm0)/(1-ps_high))/dim(hdim)[1]
+ATE_low
+ATE_high
+```
+
+
+
