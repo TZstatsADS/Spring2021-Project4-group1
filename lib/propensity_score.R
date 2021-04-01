@@ -6,9 +6,17 @@ if (!require("rpart")) install.packages("rpart")
 propensity_score_ld <- function(data) {
   # fine-tuned model
   data_clean <- subset(data, select = -Y)
+  
+  # Train test split
+  set.seed(123)
+  data_split <- initial_split(data_clean, prop = .7)
+  train <- training(data_split)
+  test  <- testing(data_split)
+  
+  # build a model
   optimal_tree <- rpart(
     formula = A ~ .,
-    data    = data_clean,
+    data    = train,
     method  = "class",
     control = list(minsplit = 20, maxdepth = 15, cp = 0.0126)
   )
@@ -22,9 +30,17 @@ propensity_score_ld <- function(data) {
 propensity_score_hd <- function(data) {
   # fine-tuned model
   data_clean <- subset(data, select = -Y)
+  
+  # Train test split
+  set.seed(123)
+  data_split <- initial_split(data_clean, prop = .7)
+  train <- training(data_split)
+  test  <- testing(data_split)
+  
+  # build a model
   optimal_tree <- rpart(
     formula = A ~ .,
-    data    = data_clean,
+    data    = train,
     method  = "class",
     control = list(minsplit = 11, maxdepth = 20, cp = 0.0126)
   )

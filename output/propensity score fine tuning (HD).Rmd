@@ -125,7 +125,7 @@ hyper_grid %>%
 ```{r}
 optimal_tree_hd <- rpart(
   formula = A ~ .,
-  data    = data,
+  data    = train,
   method  = "class",
     control = list(minsplit = 11, maxdepth = 20, cp = 0.0126)
 )
@@ -139,8 +139,4 @@ rpart.plot(optimal_tree_hd)
 
 ```{r}
 hist(pred[, 2], main='Histogram of probabilities that individual belongs to class 1', xlab = 'Probability')
-```
-
-```{r}
-hist(data$A)
 ```
