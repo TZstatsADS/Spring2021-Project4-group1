@@ -18,7 +18,8 @@ source("../lib/propensity_score.R")
 ## ATE of lower dimension data using inverse propensity weighting
 
 ```{r}
-ps_ld <- propensity_score_ld(data_ld)
+start_time_ld <- Sys.time()
+time.ps.ld<- system.time(ps_ld <- propensity_score_ld(data_ld))
 ```
 
 ```{r}
@@ -42,15 +43,17 @@ controlled_ld <- which(data_ld$A == 0)
 time.ate.ld<- system.time(
 ATE_ipw_ld <- (sum(data_ld$Y[treated_ld] * ipw_ld[treated_ld]) - sum(data_ld$Y[controlled_ld] * ipw_ld[controlled_ld]))/nrow(data_ld)
 )
+end_time_ld <- Sys.time()
+dif_time_ld <- end_time_ld - start_time_ld
+dif_time_ld
 cat("ATE of lower dimension data using inverse propensity weighting is",ATE_ipw_ld, "\n")
-cat("Time to calculate inverse propensity scores of the low dimension data is",time.ipw.ld[1],"s\n")
-cat("Time to calculate ATE of the low dimension data is using inverse propensity score",time.ate.ld[1],"s\n")
 ```
 
 ## ATE of higher dimension data using inverse propensity weighting
 
 ```{r}
-ps_hd <- propensity_score_hd(data_hd)
+start_time_hd <- Sys.time()
+time.ps.hd <- system.time(ps_hd <- propensity_score_hd(data_hd))
 ipw_hd <- rep(NA,nrow(data_hd))
 
 time.ipw.hd <- system.time(for (i in 1:nrow(data_hd)){
@@ -71,9 +74,11 @@ controlled_hd <- which(data_hd$A == 0)
 time.ate.hd<- system.time(
 ATE_ipw_hd <- (sum(data_hd$Y[treated_hd] * ipw_hd[treated_hd]) - sum(data_hd$Y[controlled_hd] * ipw_hd[controlled_hd]))/nrow(data_hd)
 )
+end_time_hd <- Sys.time()
+dif_time_hd <- end_time_hd - start_time_hd
+dif_time_hd
+
 cat("ATE of higher dimension data using inverse propensity weighting is",ATE_ipw_hd,"\n")
-cat("Time to calculate inverse propensity scores of the high dimension data is",time.ipw.hd[1],"s\n")
-cat("Time to calculate ATE of the high dimension data is using inverse propensity score",time.ate.hd[1],"s\n")
 ```
 
 

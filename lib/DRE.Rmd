@@ -5,14 +5,14 @@ output: html_notebook
 
 
 Setup
-```{r}
+```{r message = F, warning = F}
 library(glmnet)
 library(rsample)
 library(ggplot2)
 ```
 
 load data
-```{r}
+```{r message = F, warning = F}
 ldim <- read.csv("../data/lowDim_dataset.csv")
 hdim <- read.csv("../data/highDim_dataset.csv")
 
@@ -28,7 +28,7 @@ hData <- hdim[, -c(1,2)]
 ```
 
 PS
-```{r}
+```{r message = F, warning = F}
 if (!require("rpart")) install.packages("rpart")
 
 propensity_score_ld <- function(data) {
@@ -81,30 +81,35 @@ propensity_score_hd <- function(data) {
 ```
 
 Prop_score
-```{r}
+```{r message = F, warning = F}
 ps_low <- propensity_score_ld(ldim)
 ps_high <- propensity_score_hd(hdim)
 ```
 
-Linear regression
-```{r}
+Low Dim
+```{r message = F, warning = F}
+start <- Sys.time()
 lr_low1 <- glm(formula=Y~ .,data = ldim[which(ldim$A=='1'),])
 lr_low0 <- glm(formula=Y~ .,data = ldim[which(ldim$A=='0'),])
 lm1 <- predict(lr_low1,ldim[,-c(1)])
 lm0 <- predict(lr_low0,ldim[,-c(1)])
+ATE_low <- sum((lA*lY-(lA-ps_low)*lm1)/ps_low)/dim(ldim)[1] -sum(((1-lA)*lY+(lA-ps_low)*lm0)/(1-ps_low))/dim(ldim)[1]
+ATE_low
+end <- Sys.time()
+paste("Low Dim Running time :",difftime(end,start))
+```
 
+High Dim
+```{r message = F, warning = F}
+start <- Sys.time()
 lr_high1 <- glm(formula=Y~ .,data = hdim[which(hdim$A=='1'),])
 lr_high0 <- glm(formula=Y~ .,data = hdim[which(hdim$A=='0'),])
 hm1 <- predict(lr_high1,hdim[,-c(1)])
 hm0 <- predict(lr_high0,hdim[,-c(1)])
-```
-
-DRE
-```{r}
-ATE_low <- sum((lA*lY-(lA-ps_low)*lm1)/ps_low)/dim(ldim)[1] -sum(((1-lA)*lY+(lA-ps_low)*lm0)/(1-ps_low))/dim(ldim)[1]
 ATE_high <- sum((hA*hY-(hA-ps_high)*hm1)/ps_high)/dim(hdim)[1] -sum(((1-hA)*hY+(hA-ps_high)*hm0)/(1-ps_high))/dim(hdim)[1]
-ATE_low
 ATE_high
+
+paste("High Dim Running time :",difftime(Sys.time(),start))
 ```
 
 
