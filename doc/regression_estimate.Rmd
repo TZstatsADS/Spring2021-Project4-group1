@@ -14,7 +14,7 @@ library(dbplot)
 library(DBI)
  
 
-start = Sys.time()
+
 
 dfh = read.csv('C:\\Users\\morrismr\\Downloads\\data\\highDim_dataset.csv')
 dfl = read.csv('C:\\Users\\morrismr\\Downloads\\data\\lowDim_dataset.csv')
@@ -28,69 +28,38 @@ dfh_control = dfh[dfh$A == 0, ]
 dfl_treated = dfl[dfl$A == 1, ]
 dfl_control = dfl[dfl$A == 0, ]
 
+##########################################################
+start = Sys.time()
+
 mhat_highdim_1 = lm(Y~., data=dfh_treated)
 mhat_highdim_0 = lm(Y~., data=dfh_control)
-# summary(mhat_highdim_1)
-# summary(mhat_highdim_0)
 
-# mt(X) is a consistent estimate for E(Y given T = t and X)
-# regress Y on X (two cases, one for group where t = 1 and one where t = 0)
 
-hist(dfh$A)
-# str(dfh)
 N = nrow(dfh)
-sum = 0
-m1_total = 0
-m0_total = 0
-for(i in 1:N) #run through each row in original dataset
-{
-  # print(i)
-  m1 <- suppressWarnings(predict(mhat_highdim_1, newdata=dfh[i,]))
-  m0 <- suppressWarnings(predict(mhat_highdim_0, newdata=dfh[i,]))
-  m1_total = m1_total + m1
-  m0_total = m0_total + m0
-  sum = sum +  m1 - m0
-}
-output_high = sum/N
-sprintf("High-dimensional estiamte of ATE: %f", output_high)
-
-dfh_treated[1,"Y"]
-
-
+m1_high_backup <- predict(mhat_highdim_1, newdata = dfh[,-1])
+m0_high_backup <- predict(mhat_highdim_0, newdata = dfh[,-1])
+sum_high_backup <- m1_high_backup - m0_high_backup
+output_high <- sum(sum_high_backup)/N
+sprintf("High dimensional estiamte of ATE: %f", output_high)
 
 mhat_lowdim_1 = lm(Y~., data=dfl_treated)
 mhat_lowdim_0 = lm(Y~., data=dfl_control)
-# summary(mhat_lowdim_1)
-# summary(mhat_lowdim_0)
 
-# mt(X) is a consistent estimate for E(Y given T = t and X)
-# regress Y on X (two cases, one for group where t = 1 and one where t = 0)
-
-# hist(dfl$A)
-
-# str(dfl)
 N = nrow(dfl)
-sum = 0
-m1_total = 0
-m0_total = 0
-for(i in 1:N) #run through each row in original dataset
-{
-  # print(i)
-  m1 <- suppressWarnings(predict(mhat_lowdim_1, newdata=dfl[i,]))
-  m0 <- suppressWarnings(predict(mhat_lowdim_0, newdata=dfl[i,]))
-  m1_total = m1_total + m1
-  m0_total = m0_total + m0
-  sum = sum +  m1 - m0
-}
-output_low = sum/N
+m1_low_backup <- predict(mhat_lowdim_1, newdata = dfl[,-1])
+m0_low_backup <- predict(mhat_lowdim_0, newdata = dfl[,-1])
+sum_low_backup <- m1_low_backup - m0_low_backup
+output_low <- sum(sum_low_backup)/N
+sprintf("Low-dimensional estiamte of ATE: %f", output_low)
 
-sprintf("Low dimensional estiamte of ATE: %f", output_low)
+
+
 
 end = Sys.time()
 print(as.numeric(end - start, units = "secs"))
 
 
-
+##########################################################
 
 
 ```
