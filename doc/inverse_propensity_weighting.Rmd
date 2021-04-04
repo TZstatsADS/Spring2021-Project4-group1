@@ -1,0 +1,79 @@
+---
+title: "Inverse Propensity Weighting"
+author: "Changhao He"
+date: "2021/3/30"
+output: html_document
+---
+
+```{r}
+data_ld <- read.csv(file = "../data/lowDim_dataset.csv")
+data_hd <- read.csv(file = "../data/highDim_dataset.csv")
+```
+
+
+```{r}
+source("../lib/propensity_score.R")
+```
+
+## ATE of lower dimension data using inverse propensity weighting
+
+```{r}
+ps_ld <- propensity_score_ld(data_ld)
+```
+
+```{r}
+ipw_ld <- rep(NA,nrow(data_ld))
+time.ipw.ld <- system.time(for (i in 1:nrow(data_ld)){
+  if (data_ld$A[i] == 1){
+  ipw_ld[i] <- 1/ps_ld[i]
+  }
+  else{
+  ipw_ld[i] <- 1/(1-ps_ld[i])
+  }
+})
+```
+
+```{r}
+
+
+treated_ld <- which(data_ld$A == 1)
+controlled_ld <- which(data_ld$A == 0)
+
+time.ate.ld<- system.time(
+ATE_ipw_ld <- (sum(data_ld$Y[treated_ld] * ipw_ld[treated_ld]) - sum(data_ld$Y[controlled_ld] * ipw_ld[controlled_ld]))/nrow(data_ld)
+)
+cat("ATE of lower dimension data using inverse propensity weighting is",ATE_ipw_ld, "\n")
+cat("Time to calculate inverse propensity scores of the low dimension data is",time.ipw.ld[1],"s\n")
+cat("Time to calculate ATE of the low dimension data is using inverse propensity score",time.ate.ld[1],"s\n")
+```
+
+## ATE of higher dimension data using inverse propensity weighting
+
+```{r}
+ps_hd <- propensity_score_hd(data_hd)
+ipw_hd <- rep(NA,nrow(data_hd))
+
+time.ipw.hd <- system.time(for (i in 1:nrow(data_hd)){
+  if (data_hd$A[i] == 1){
+  ipw_hd[i] <- 1/ps_hd[i]
+  }
+  else{
+  ipw_hd[i] <- 1/(1-ps_hd[i])
+  }
+})
+```
+
+```{r}
+
+treated_hd <- which(data_hd$A == 1)
+controlled_hd <- which(data_hd$A == 0)
+
+time.ate.hd<- system.time(
+ATE_ipw_hd <- (sum(data_hd$Y[treated_hd] * ipw_hd[treated_hd]) - sum(data_hd$Y[controlled_hd] * ipw_hd[controlled_hd]))/nrow(data_hd)
+)
+cat("ATE of higher dimension data using inverse propensity weighting is",ATE_ipw_hd,"\n")
+cat("Time to calculate inverse propensity scores of the high dimension data is",time.ipw.hd[1],"s\n")
+cat("Time to calculate ATE of the high dimension data is using inverse propensity score",time.ate.hd[1],"s\n")
+```
+
+
