@@ -5,14 +5,14 @@ output: html_notebook
 
 
 Setup
-```{r}
+```{r message = F, warning = F}
 library(glmnet)
 library(rsample)
 library(ggplot2)
 ```
 
 load data
-```{r}
+```{r message = F, warning = F}
 ldim <- read.csv("../data/lowDim_dataset.csv")
 hdim <- read.csv("../data/highDim_dataset.csv")
 
@@ -28,7 +28,7 @@ hData <- hdim[, -c(1,2)]
 ```
 
 PS
-```{r}
+```{r message = F, warning = F}
 if (!require("rpart")) install.packages("rpart")
 
 propensity_score_ld <- function(data) {
@@ -81,13 +81,13 @@ propensity_score_hd <- function(data) {
 ```
 
 Prop_score
-```{r}
+```{r message = F, warning = F}
 ps_low <- propensity_score_ld(ldim)
 ps_high <- propensity_score_hd(hdim)
 ```
 
-Linear regression
-```{r}
+Low Dim
+```{r message = F, warning = F}
 start <- Sys.time()
 lr_low1 <- glm(formula=Y~ .,data = ldim[which(ldim$A=='1'),])
 lr_low0 <- glm(formula=Y~ .,data = ldim[which(ldim$A=='0'),])
@@ -99,8 +99,8 @@ end <- Sys.time()
 paste("Low Dim Running time :",difftime(end,start))
 ```
 
-DRE
-```{r}
+High Dim
+```{r message = F, warning = F}
 start <- Sys.time()
 lr_high1 <- glm(formula=Y~ .,data = hdim[which(hdim$A=='1'),])
 lr_high0 <- glm(formula=Y~ .,data = hdim[which(hdim$A=='0'),])
