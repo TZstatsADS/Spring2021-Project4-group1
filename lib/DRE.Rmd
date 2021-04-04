@@ -102,12 +102,13 @@ paste("Low Dim Running time :",difftime(end,start))
 DRE
 ```{r}
 start <- Sys.time()
-ATE_high <- sum((hA*hY-(hA-ps_high)*hm1)/ps_high)/dim(hdim)[1] -sum(((1-hA)*hY+(hA-ps_high)*hm0)/(1-ps_high))/dim(hdim)[1]
-ATE_high
 lr_high1 <- glm(formula=Y~ .,data = hdim[which(hdim$A=='1'),])
 lr_high0 <- glm(formula=Y~ .,data = hdim[which(hdim$A=='0'),])
 hm1 <- predict(lr_high1,hdim[,-c(1)])
 hm0 <- predict(lr_high0,hdim[,-c(1)])
+ATE_high <- sum((hA*hY-(hA-ps_high)*hm1)/ps_high)/dim(hdim)[1] -sum(((1-hA)*hY+(hA-ps_high)*hm0)/(1-ps_high))/dim(hdim)[1]
+ATE_high
+
 paste("High Dim Running time :",difftime(Sys.time(),start))
 ```
 
