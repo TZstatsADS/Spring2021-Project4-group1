@@ -8,7 +8,7 @@ Source: https://uc-r.github.io/regression_trees
 
 ## R Markdown
 ```{r}
-setwd("/Users/my_love/Desktop/Applied Data Science/Project 4/Spring2021-Project4-project4group1/")
+setwd("/Users/my_love/Desktop/Desktop/Applied Data Science/Project 4/Spring2021-Project4-project4group1/")
 data <- read.csv(file = "data/lowDim_dataset.csv")
 data <- subset(data, select = -Y)
 ```

@@ -70,7 +70,6 @@ $$
 $$
 
 [TODO: Add implementation details]
-[TODO: Add a visualization for ATE]
 
 Source: https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/36552.pdf
 
@@ -84,7 +83,6 @@ $$
 where $\hat{m_t}(X)$ is a consistentt estimate for $E(Y|T=t, X)$ and is obtained by regressing the observed response $Y$ on $X$ in group t (where $t = 0, 1$). It is "doubly robust" in a way that it requires only one model to be consistent - either propensity score model or the regression model. Computation of both models makes the Doubly Robust Estimator less efficient however, it produces the smallest asymptotic variance. 
 
 [TODO: Add implementation details]
-[TODO: Add a visualization for ATE]
 
 ## Regression Estimate
 Regression Estimate is a simple regression algorithm that doesn’t make use of the propensity score. The model makes predictions for the control and treatment groups, and calculates the ATE using these predictions. The formula is below: 
@@ -94,21 +92,24 @@ $$
 $$
 
 The regression estimate was computed by first deriving consistent estimators for $E(Y|T =1, X)$ and $E(Y|T =1, X)$, respectively. These estimators were derived by computing two regression estimates on Y (corresponding to the subsets of the data where $T = 1$ and $T = 0$) using all the features as predictors. Then, using a simple for loop, we could easily compute the regression estimate for the dataset by looking at the linear model predictions on each row of data (observation). We took the difference of the predictions for the treated and untreated estimators and then summed all the differences, then divided by N (the number of observations) to get our average treatment effect. The approach was identical for both low-dimensional and high dimensional data. The expression for the time complexity was determined by that of linear regression, since this part of the algorithm dominated the rest.
-[TODO: Add a visualization for ATE]
 
 # Step 3: Comparison of Algorithms for High Dimensional Data
 Note: $performance = (true\_ate - est\_ate)^2$
 ```{r echo=FALSE}
+true_ate = c(-54.8558, -54.8558, -54.8558)
+computed_ate = c(-60.09444, -57.47854, -57.426587)
+performance = (computed_ate - true_ate)^2
+   
 comparison_table_hd <- data.frame(
    "Algorithm" = c(
      "Inverse Propensity Weighting",
      "Doubly Robust Estimation",
      "Regression Estimate"),
-   "Complexity" = c("O()", "O()", "O(N*P^2 + P^3)"),
-   "True_ATE" = c(-54.8558, -54.8558, -54.8558),
-   "Computed_ATE" = c(-61.89046, 0, 0),
-   "Run_Time" = c("sec", "sec", "31 sec"),
-   "Performance" = c(0, 0, 0)
+   "Complexity" = c("O(N)", "O(N)", "O(N*P^2 + P^3)"),
+   "True_ATE" = true_ate,
+   "Computed_ATE" = computed_ate,
+   "Run_Time" = c("1.1253 sec", "sec", "0.313 sec"),
+   "Performance" = performance
 )
 
 comparison_table_hd %>%
@@ -118,16 +119,21 @@ comparison_table_hd %>%
 # Step 4: Comparison of Algorithms for Low Dimensional Data
 Note: $performance = (true\_ate - est\_ate)^2$
 ```{r echo=FALSE}
+
+true_ate_ld = c(2.0901, 2.0901, 2.0901)
+computed_ate_ld = c(6.620976, 2.175476, 2.125138)
+performance_ld = (computed_ate_ld - true_ate_ld)^2
+
 comparison_table_ld <- data.frame(
    "Algorithm" = c(
      "Inverse Propensity Weighting",
      "Doubly Robust Estimation",
      "Regression Estimate"),
-   "Complexity" = c("O()", "O()", "O()"),
-   "True_ATE" = c(2.0901, 2.0901, 2.0901),
-   "Computed_ATE" = c(4.35356, 0, 0),
-   "Run_Time" = c("sec", "sec", "sec"),
-   "Performance" = c(0, 0, 0)
+   "Complexity" = c("O(N)", "O(N)", "O()"),
+   "True_ATE" = true_ate_ld,
+   "Computed_ATE" = computed_ate_ld,
+   "Run_Time" = c("0.7064 sec", "sec", ".088 sec"),
+   "Performance" = performance_ld
 )
 
 comparison_table_ld %>%
@@ -136,4 +142,4 @@ comparison_table_ld %>%
 ```
  
 # Step 5: Analysis and Conclusion
-As we can see from the table above ...
+As we can see from the table above ... 
