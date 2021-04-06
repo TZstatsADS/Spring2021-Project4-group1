@@ -39,7 +39,7 @@ Term: Spring 2021
 	
 + **Contribution statement**: All team members approve our work presented in this GitHub repository including this contributions statement. 
 
-	+ ** Ai, Haosheng**: Collaborated on implementing the Doubly robust estimation algorithm, contributed to PPT, presented the project.  
+	+ **Ai, Haosheng**: Collaborated on implementing the Doubly robust estimation algorithm, contributed to PPT, presented the project.  
 	+ **He, Changhao**: Implemented Inverse propensity score algorithm, contributed to PPT.
 	+ **Maslova, Olha**: Implemented and fine tuned Propensity score function, wrote final report, contributed to PPT, run the test of all algorithms, updated GitHub ReadMe files.
 	+ **Morrissey, Mark**: Implemented and fine tuned Regression estimation algorithm, contributed to PPT and final report. 
