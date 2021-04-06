@@ -6,14 +6,16 @@ output: html_document
 ---
 
 ```{r}
+if(!require(rpart)) install.packages('rpart')
+if(!require(rsample)) install.packages('rsample')
+```
+
+```{r}
+#load low dimension data and high dimension data
 data_ld <- read.csv(file = "../data/lowDim_dataset.csv")
 data_hd <- read.csv(file = "../data/highDim_dataset.csv")
 ```
 
-```{r}
-if(!require(rpart)) install.packages('rpart')
-if(!require(rsample)) install.packages('rsample')
-```
 
 ```{r}
 source("../lib/propensity_score.R")
@@ -22,63 +24,65 @@ source("../lib/propensity_score.R")
 ## ATE of lower dimension data using inverse propensity weighting
 
 ```{r}
+#Set the starting time and calculate the propensity score of each observation in low dimension data
 start_time_ld <- Sys.time()
-time.ps.ld<- system.time(ps_ld <- propensity_score_ld(data_ld))
-```
+ps_ld <- propensity_score_ld(data_ld)
 
-```{r}
+#Calculate the inverse propensity weight
 ipw_ld <- rep(NA,nrow(data_ld))
-time.ipw.ld <- system.time(for (i in 1:nrow(data_ld)){
+for (i in 1:nrow(data_ld)){
   if (data_ld$A[i] == 1){
   ipw_ld[i] <- 1/ps_ld[i]
   }
   else{
   ipw_ld[i] <- 1/(1-ps_ld[i])
   }
-})
-```
+}
 
-```{r}
-
-
+#Based on the inverse propensity weight calculate the ATE
 treated_ld <- which(data_ld$A == 1)
 controlled_ld <- which(data_ld$A == 0)
 
 time.ate.ld<- system.time(
 ATE_ipw_ld <- (sum(data_ld$Y[treated_ld] * ipw_ld[treated_ld]) - sum(data_ld$Y[controlled_ld] * ipw_ld[controlled_ld]))/nrow(data_ld)
 )
-end_time_ld <- Sys.time()
-dif_time_ld <- end_time_ld - start_time_ld
+end_time_ld <- Sys.time()#Set ending time
+dif_time_ld <- end_time_ld - start_time_ld#Time cost for the entire calculation
 dif_time_ld
 cat("ATE of lower dimension data using inverse propensity weighting is",ATE_ipw_ld, "\n")
 ```
 
+
 ## ATE of higher dimension data using inverse propensity weighting
 
 ```{r}
+#Set the starting time and calculate the propensity score of each observation in high dimension data
 start_time_hd <- Sys.time()
-time.ps.hd <- system.time(ps_hd <- propensity_score_hd(data_hd))
-ipw_hd <- rep(NA,nrow(data_hd))
 
-time.ipw.hd <- system.time(for (i in 1:nrow(data_hd)){
+#Calculate the propensity scores of high dimension data
+ps_hd <- propensity_score_hd(data_hd)
+
+#Calculate inverse propensity weight using the above propensity score
+ipw_hd <- rep(NA,nrow(data_hd))
+for (i in 1:nrow(data_hd)){
   if (data_hd$A[i] == 1){
   ipw_hd[i] <- 1/ps_hd[i]
   }
   else{
   ipw_hd[i] <- 1/(1-ps_hd[i])
   }
-})
-```
+}
 
-```{r}
-
+#Split high data into treat group and control group, then calculate the ATE using inverse propensity score
 treated_hd <- which(data_hd$A == 1)
 controlled_hd <- which(data_hd$A == 0)
 
 time.ate.hd<- system.time(
 ATE_ipw_hd <- (sum(data_hd$Y[treated_hd] * ipw_hd[treated_hd]) - sum(data_hd$Y[controlled_hd] * ipw_hd[controlled_hd]))/nrow(data_hd)
 )
+#Set the ending time
 end_time_hd <- Sys.time()
+#Get the time for the entire calculation
 dif_time_hd <- end_time_hd - start_time_hd
 dif_time_hd
 
