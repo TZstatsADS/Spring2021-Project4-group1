@@ -10,6 +10,10 @@ data_ld <- read.csv(file = "../data/lowDim_dataset.csv")
 data_hd <- read.csv(file = "../data/highDim_dataset.csv")
 ```
 
+```{r}
+if(!require(rpart)) install.packages('rpart')
+if(!require(rsample)) install.packages('rsample')
+```
 
 ```{r}
 source("../lib/propensity_score.R")
