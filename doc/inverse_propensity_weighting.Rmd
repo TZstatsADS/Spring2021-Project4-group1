@@ -31,19 +31,22 @@ ps_ld <- propensity_score_ld(data_ld)
 #Calculate the inverse propensity weight
 ipw_ld <- rep(NA,nrow(data_ld))
 for (i in 1:nrow(data_ld)){
+#If the ith observation is in treated group, use 1/propensity score to calculate the inverse propensity weight
   if (data_ld$A[i] == 1){
   ipw_ld[i] <- 1/ps_ld[i]
   }
+#If the ith observation is in the controlled group, use 1/(1-propensity score) to calculate the inverse propensity score
   else{
   ipw_ld[i] <- 1/(1-ps_ld[i])
   }
 }
 
-#Based on the inverse propensity weight calculate the ATE
+#Split low dimension data into treated group and control group, then calculate the ATE using inverse propensity score
 treated_ld <- which(data_ld$A == 1)
 controlled_ld <- which(data_ld$A == 0)
 
 time.ate.ld<- system.time(
+#Calculate the sum of production of Y value and inverse propensity weight of each observation in the treated group and controlled group separately. Subtract the sum of controlled group from the sum of treated group. Then dividing this value by the total amount of observations in both group will give us the ATE.
 ATE_ipw_ld <- (sum(data_ld$Y[treated_ld] * ipw_ld[treated_ld]) - sum(data_ld$Y[controlled_ld] * ipw_ld[controlled_ld]))/nrow(data_ld)
 )
 end_time_ld <- Sys.time()#Set ending time
@@ -65,19 +68,22 @@ ps_hd <- propensity_score_hd(data_hd)
 #Calculate inverse propensity weight using the above propensity score
 ipw_hd <- rep(NA,nrow(data_hd))
 for (i in 1:nrow(data_hd)){
+#If the ith observation is in treated group, use 1/propensity score to calculate the inverse propensity weight
   if (data_hd$A[i] == 1){
   ipw_hd[i] <- 1/ps_hd[i]
   }
   else{
+#If the ith observation is in the controlled group, use 1/(1-propensity score) to calculate the inverse propensity score
   ipw_hd[i] <- 1/(1-ps_hd[i])
   }
 }
 
-#Split high data into treat group and control group, then calculate the ATE using inverse propensity score
+#Split high dimension data into treated group and control group, then calculate the ATE using inverse propensity score
 treated_hd <- which(data_hd$A == 1)
 controlled_hd <- which(data_hd$A == 0)
 
 time.ate.hd<- system.time(
+#Calculate the sum of production of Y value and inverse propensity weight of each observation in the treated group and controlled group separately. Subtract the sum of controlled group from the sum of treated group. Then dividing this value by the total amount of observations in both group will give us the ATE.
 ATE_ipw_hd <- (sum(data_hd$Y[treated_hd] * ipw_hd[treated_hd]) - sum(data_hd$Y[controlled_hd] * ipw_hd[controlled_hd]))/nrow(data_hd)
 )
 #Set the ending time
@@ -88,5 +94,4 @@ dif_time_hd
 
 cat("ATE of higher dimension data using inverse propensity weighting is",ATE_ipw_hd,"\n")
 ```
-
 
