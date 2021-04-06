@@ -60,8 +60,8 @@ end = Sys.time()
 print(as.numeric(end - start, units = "secs"))
 
 
-hist(sum_low_backup, main ='Distribution of low dimensional terms within sum')
-hist(sum_high_backup, main = 'Distribution of high dimensional terms within sum ')
+hist(sum_low_backup, main ='Distribution of low dimensional terms within sum', breaks=50)
+hist(sum_high_backup, main = 'Distribution of high dimensional terms within sum ', breaks=50)
 
 
 ##########################################################

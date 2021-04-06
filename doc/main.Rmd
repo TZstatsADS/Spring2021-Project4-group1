@@ -9,7 +9,13 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 if (!require("kableExtra")) install.packages("kableExtra")
-library(kableExtra)
+if (!require("cowplot")) install.packages("cowplot")
+if (!require("ggplot2")) install.packages("ggplot2")
+if (!require("magick")) install.packages("magick")
+
+library(ggplot2)
+library(cowplot)
+library(magick)
 ```
 
 # Introduction
@@ -26,6 +32,7 @@ assuming that for all x
 $$
 0<e(x)<1
 $$
+
 ### Classification and Regression Trees (CART)
 In this project we will be using CART to estimate the propensity scores. In brief, CART is a classification and regression algorithm, which specify a ‘tree’ of cut points that minimize some measures of diversity in the final nodes once the the tree is complete. CART provides a probability of class membership, which we will use as our propensity score.
 
@@ -37,11 +44,12 @@ $$
 
 where M is the total number of regions.
 
-
 ###  Computing Propensity Scores
 To compute propensity scores, we used CART. We built two separate fine-tuned models for high-dimensional and low-dimensional data, respectively. Each model returns a set of probabilities that a given data point belongs to class 1.
 
-![Decision tree for low dimensional data](../figs/tree ld.png){width=60%}
+To evaluate the performance of propensity scores we made sure that all the values lie between 0 and 1 (exclusively) and that they are not close to 1 or 0. According to "Evaluating Online Ad Campaigns in a Pipeline: Causal Models At Scale", propensity scores close to 1 "arise if X nearly separates the controls and exposed. In that case, estimation by any method may be unwise because too few controls resemble the exposed"[10].
+
+![Decision tree for low-dimensional data](../figs/tree ld.png){width=60%}
 
 ![Histogram of probabilities that an individual belongs to class 1 for low dimenssional data](../figs/hist ld prob.png){width=60%}
 
@@ -49,6 +57,8 @@ To compute propensity scores, we used CART. We built two separate fine-tuned mod
 
 ![Histogram of probabilities that an individual belongs to class 1 for high dimenssional data.](../figs/hist hd prob.png){width=60%}
 
+
+\newpage
 # Step 2: Algorithms
 
 ## Inverse Propensity Weighting (IPW)
@@ -69,8 +79,6 @@ $$
 \hat{\Delta}_{IPW} = \frac{1}{N}(\sum_{i \in treated}w_iY_i -\sum_{i \in controlled} w_iY_i)
 $$
 
-[TODO: Add implementation details]
-
 Source: https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/36552.pdf
 
 ## Doubly Robust Estimation
@@ -82,8 +90,6 @@ $$
 
 where $\hat{m_t}(X)$ is a consistentt estimate for $E(Y|T=t, X)$ and is obtained by regressing the observed response $Y$ on $X$ in group t (where $t = 0, 1$). It is "doubly robust" in a way that it requires only one model to be consistent - either propensity score model or the regression model. Computation of both models makes the Doubly Robust Estimator less efficient however, it produces the smallest asymptotic variance. 
 
-[TODO: Add implementation details]
-
 ## Regression Estimate
 Regression Estimate is a simple regression algorithm that doesn’t make use of the propensity score. The model makes predictions for the control and treatment groups, and calculates the ATE using these predictions. The formula is below: 
 
@@ -93,6 +99,11 @@ $$
 
 The regression estimate was computed by first deriving consistent estimators for $E(Y|T =1, X)$ and $E(Y|T =1, X)$, respectively. These estimators were derived by computing two regression estimates on Y (corresponding to the subsets of the data where $T = 1$ and $T = 0$) using all the features as predictors. Then, using a simple for loop, we could easily compute the regression estimate for the dataset by looking at the linear model predictions on each row of data (observation). We took the difference of the predictions for the treated and untreated estimators and then summed all the differences, then divided by N (the number of observations) to get our average treatment effect. The approach was identical for both low-dimensional and high dimensional data. The expression for the time complexity was determined by that of linear regression, since this part of the algorithm dominated the rest.
 
+![Distribution of predicted treatment effects (high-dimenssional data)](../figs/high_dim_hist_reg.png){width=60%}
+
+![Distribution of predicted treatment effects (low-dimenssional data)](../figs/low_dim_hist_reg.png){width=60%}
+
+\newpage
 # Step 3: Comparison of Algorithms for High Dimensional Data
 Note: $performance = (true\_ate - est\_ate)^2$
 ```{r echo=FALSE}
@@ -105,10 +116,10 @@ comparison_table_hd <- data.frame(
      "Inverse Propensity Weighting",
      "Doubly Robust Estimation",
      "Regression Estimate"),
-   "Complexity" = c("O(N)", "O(N)", "O(N*P^2 + P^3)"),
+   "Complexity" = c("O(N)", "O(N)", "O(N)"),
    "True_ATE" = true_ate,
    "Computed_ATE" = computed_ate,
-   "Run_Time" = c("1.1253 sec", "sec", "0.313 sec"),
+   "Run_Time" = c("1.93s", "0.47s", "0.28s"),
    "Performance" = performance
 )
 
@@ -129,10 +140,10 @@ comparison_table_ld <- data.frame(
      "Inverse Propensity Weighting",
      "Doubly Robust Estimation",
      "Regression Estimate"),
-   "Complexity" = c("O(N)", "O(N)", "O()"),
+   "Complexity" = c("O(N)", "O(N)", "O(N)"),
    "True_ATE" = true_ate_ld,
    "Computed_ATE" = computed_ate_ld,
-   "Run_Time" = c("0.7064 sec", "sec", ".088 sec"),
+   "Run_Time" = c("0.68s", "0.05s", "0.02s"),
    "Performance" = performance_ld
 )
 
@@ -142,4 +153,8 @@ comparison_table_ld %>%
 ```
  
 # Step 5: Analysis and Conclusion
-As we can see from the table above ... 
+To summarize our findings, we found that the Inverse Propensity Score performs the worst among the given three algorithms for both data sets. The reason lies in choosing the Classification and Regression Trees as a propensity score function. CART is very unstable because training a tree with a slightly different sub-sample causes the tree's structure to change drastically. Though we tried to avoid overfitting, it is hard to do so without using Random Forest or Bagging techniques.
+
+The next algorithm, Doubly Robust Estimation, is our second-best result. It combines the result from Linear Regression Estimation and propensity scores to estimate the causal effect. This method reduces the likelihood of our estimate being biased since only one model needs to correctly specify the outcome to obtain an unbiased estimator. However, this model comes with its downsides - it is less efficient and more complex because it technically combines these two models.
+
+And finally, our best algorithm is a Regression Estimate. Not only does it performs the best in term of the estimation, but it is also the simplest and the fastest model of all three. Also, an interesting observation is that the Regression Estimation algorithm performs slightly better than Doubly Robust Estimation. The reason probably lies in CART being very unstable. It introduces unnecessary bias to our model.
