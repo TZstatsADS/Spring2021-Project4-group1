@@ -4,67 +4,68 @@ output: html_notebook
 ---
 
 ```{r}
+# Setup
 library(dplyr)
 library(dbplyr)
 library(dbplot)
 library(DBI)
- 
 
-
-
+# load data
 dfh = read.csv('../data/highDim_dataset.csv')
 dfl = read.csv('../data/lowDim_dataset.csv')
 
-# dfh['my_extra_column'] = dfh['A'] + 1
-  
-
-
-dfh_treated = dfh[dfh$A == 1, ]#expr[expr$cell_type %in% c("hesc", "bj fibroblast"), ]
+dfh_treated = dfh[dfh$A == 1, ]
 dfh_control = dfh[dfh$A == 0, ]
 dfl_treated = dfl[dfl$A == 1, ]
 dfl_control = dfl[dfl$A == 0, ]
 
-##########################################################
+# start the timer
 start = Sys.time()
 
+# build the linear model for high dimenssional data
 mhat_highdim_1 = lm(Y~., data=dfh_treated)
 mhat_highdim_0 = lm(Y~., data=dfh_control)
 
-
+# number of inputs
 N = nrow(dfh)
+
+# make predictions
 m1_high_backup <- predict(mhat_highdim_1, newdata = dfh[,-1])
 m0_high_backup <- predict(mhat_highdim_0, newdata = dfh[,-1])
+
+# compute ATE
 sum_high_backup <- m1_high_backup - m0_high_backup
 output_high <- sum(sum_high_backup)/N
 sprintf("High dimensional estiamte of ATE: %f", output_high)
 
-mhat_lowdim_1 = lm(Y~., data=dfl_treated)
-mhat_lowdim_0 = lm(Y~., data=dfl_control)
-
-
+# print time
 end = Sys.time()
 print(as.numeric(end - start, units = "secs"))
 
+# build the linear model for low dimenssional data
+mhat_lowdim_1 = lm(Y~., data=dfl_treated)
+mhat_lowdim_0 = lm(Y~., data=dfl_control)
+
+# start timer for low dim data
 start = Sys.time()
+
+# number of inputs
 N = nrow(dfl)
+
+# make Predictions 
 m1_low_backup <- predict(mhat_lowdim_1, newdata = dfl[,-1])
 m0_low_backup <- predict(mhat_lowdim_0, newdata = dfl[,-1])
+
+# compute ATE
 sum_low_backup <- m1_low_backup - m0_low_backup
 output_low <- sum(sum_low_backup)/N
 sprintf("Low-dimensional estiamte of ATE: %f", output_low)
 
-
-
-
+#print time for low dim
 end = Sys.time()
 print(as.numeric(end - start, units = "secs"))
 
-
+# print histograms for the distribution of the predicted treatment effects
 hist(sum_low_backup, main ='Distribution of low dimensional terms within sum', breaks=50)
 hist(sum_high_backup, main = 'Distribution of high dimensional terms within sum ', breaks=50)
-
-
-##########################################################
-
-
 ```

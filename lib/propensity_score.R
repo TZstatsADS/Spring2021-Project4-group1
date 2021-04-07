@@ -1,10 +1,11 @@
 # Source: https://uc-r.github.io/regression_trees
 # for hyper-parameters tuning see propensity score fine tuning files in output directory
 
+# import
 if (!require("rpart")) install.packages("rpart")
 
 propensity_score_ld <- function(data) {
-  # fine-tuned model
+  # remove Y from the data set
   data_clean <- subset(data, select = -Y)
   
   # Train test split
@@ -28,7 +29,7 @@ propensity_score_ld <- function(data) {
 }
 
 propensity_score_hd <- function(data) {
-  # fine-tuned model
+  # remove Y column
   data_clean <- subset(data, select = -Y)
   
   # Train test split
