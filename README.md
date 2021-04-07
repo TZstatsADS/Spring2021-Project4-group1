@@ -43,7 +43,7 @@ Term: Spring 2021
 	+ **He, Changhao**: Implemented Inverse propensity score algorithm, contributed to PPT.
 	+ **Maslova, Olha**: Implemented and fine tuned Propensity score function, wrote final report, contributed to PPT, run the test of all algorithms, updated GitHub ReadMe files.
 	+ **Morrissey, Mark**: Implemented and fine tuned Regression estimation algorithm, contributed to PPT and final report. 
-	+ **Yang, Qizhen**: Collaborated on implementing the Doubly robust estimation algorithm, contributed to PPT.
+	+ **Yang, Qizhen**: Collaborated on implementing the Doubly robust estimation algorithm, contributed to PPT and final report.
 
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
